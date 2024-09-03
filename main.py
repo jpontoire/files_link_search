@@ -4,12 +4,10 @@ import collections
 import ural
 
 domain_counter = collections.Counter()
-count = 0
 
 with gzip.open('fakenews_tweets.csv.gz', 'rt') as file:
     csv_reader = csv.DictReader(file)
     for row in csv_reader:
-        count+=1
         url = row['links']
         domain_name = ural.get_domain_name(url)
         if domain_name != None:
@@ -17,7 +15,9 @@ with gzip.open('fakenews_tweets.csv.gz', 'rt') as file:
             for domain in domain_list:
                 domain = domain.strip()
                 domain_counter[domain] += 1
-        if count == 100000:
-            print(domain_counter.most_common(100))
-            count = 0
 print(domain_counter.most_common(100))
+
+result_file = open('domain_fakenews_tweets.csv', 'w')
+file_writer = csv.writer(result_file)
+for domain_dict in domain_counter.most_common():
+    file_writer.writerow([domain_dict[0], domain_dict[1]])
