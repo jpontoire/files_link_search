@@ -18,6 +18,6 @@ with gzip.open('fakenews_tweets.csv.gz', 'rt') as file:
                 domain = domain.strip()
                 domain_counter[domain] += 1
         if count == 100000:
-            print(domain_counter)
+            print(domain_counter.most_common(100))
             count = 0
-print(domain_counter)
+print(domain_counter.most_common(100))
