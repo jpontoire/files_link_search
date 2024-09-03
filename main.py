@@ -1,21 +1,15 @@
-# import pandas as pd
-# data = pd.read_csv('fakenews_tweets.csv.gz', nrows=100, compression='gzip')
-# for i in data['links']:
-#     print(i)
-
 import gzip
 import csv
 import collections
 import ural
 
-dico = collections.defaultdict(int)
+domain_counter = collections.Counter()
 
 with gzip.open('fakenews_tweets.csv.gz', 'rt') as file:
-    text = csv.DictReader(file, delimiter=',')
-    count = 0
-    for row in text:
+    csv_reader = csv.DictReader(file)
+    for row in csv_reader:
         url = row['links']
-        domain = ural.get_domain_name(url)
-        if domain != None:
-            dico[domain] += 1
-print(dico)
+        domain_name = ural.get_domain_name(url)
+        if domain_name != None:
+            domain_counter[domain_name] += 1
+print(domain_counter)
