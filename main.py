@@ -6,11 +6,13 @@ import tqdm
 from shorteners import SHORTENER_DOMAINS
 
 
-def make_csv():
+def count_domains(in_file, out_file):
+    "permet de compter le nombre de fois qu'apparait un nom de domaine dans le fichier csv donné en paramètre s'il est dans le bon format et renvoie \
+        le résultat dans un autre fichier csv"
     domain_counter = collections.Counter()
     domain_url = collections.defaultdict(list)
 
-    with gzip.open('fakenews_tweets.csv.gz', 'rt') as file:
+    with gzip.open(in_file, 'rt') as file:
         csv_reader = csv.DictReader(file)
         for row in tqdm.tqdm(csv_reader):
             urls = row['links']
@@ -22,7 +24,7 @@ def make_csv():
                     if len(domain_url[domain_name]) < 3:
                         domain_url[domain_name].append(url)
 
-    with open('domain_fakenews_tweets_test.csv', 'w') as result_file:
+    with open(out_file, 'w') as result_file:
         file_writer = csv.writer(result_file)
         file_writer.writerow(['Domain', 'Count', 'URL'])
         for domain_dict in domain_counter.most_common():
@@ -34,27 +36,27 @@ def make_csv():
             tmp = ""
 
 
-def reduce_nb_domain_v1():
+def reduce_by_total_url_size(in_file, out_file):
     "réduit le nombre de domaines par rapport à la taille totale des URL"
-    with open('reduced_file_v1.csv', 'w') as output_file:
+    with open(out_file, 'w') as output_file:
         csv_writer = csv.writer(output_file)
         csv_writer.writerow(['Domain', 'Count', 'URL'])
-    with open('domain_fakenews_tweets.csv') as input_file:
+    with open(in_file) as input_file:
         csv_reader = csv.DictReader(input_file)
         for row in csv_reader:
             size = len(row['URL'])
             if size < 150:
-                with open('reduced_file_v1.csv', 'a') as output_file:
+                with open(out_file, 'a') as output_file:
                     csv_writer = csv.writer(output_file)
                     csv_writer.writerow([row['Domain'],row['Count'],row['URL']])
 
 
-def reduce_nb_domain_v2():
+def reduce_by_url_size(in_file, out_file):
     "réduit le nombre de domaines par rapport à la taille de chaque URL"
-    with open('reduced_file_v2.csv', 'w') as output_file:
+    with open(out_file, 'w') as output_file:
         csv_writer = csv.writer(output_file)
         csv_writer.writerow(['Domain', 'Count', 'URL'])
-    with open('domain_fakenews_tweets.csv') as input_file:
+    with open(in_file) as input_file:
         csv_reader = csv.DictReader(input_file)
         for row in csv_reader:
             tmp = row['URL']
@@ -64,21 +66,21 @@ def reduce_nb_domain_v2():
                 if len(url) > 50:
                     verif = False
             if verif:
-                with open('reduced_file_v2.csv', 'a') as output_file:
+                with open(out_file, 'a') as output_file:
                     csv_writer = csv.writer(output_file)
                     csv_writer.writerow([row['Domain'],row['Count'],row['URL']])
 
 
-def remove_shorteners():
+def remove_shorteners(in_file, out_file):
     "supprime les noms de domaine déjà connus comme des shorteners"
-    with open('reduced_file_v3.csv', 'w') as output_file:
+    with open(out_file, 'w') as output_file:
         csv_writer = csv.writer(output_file)
         csv_writer.writerow(['Domain', 'Count', 'URL'])
-    with open('reduced_file_v2.csv') as input_file:
+    with open(in_file) as input_file:
         csv_reader = csv.DictReader(input_file)
         for row in csv_reader:
             if row['Domain'] not in SHORTENER_DOMAINS:
-                with open('reduced_file_v3.csv', 'a') as output_file:
+                with open(out_file, 'a') as output_file:
                     csv_writer = csv.writer(output_file)
                     csv_writer.writerow([row['Domain'],row['Count'],row['URL']])
 
@@ -105,6 +107,7 @@ def reduce_by_path(in_file, out_file):
 
 
 def main():
+    "boucle principale"
     # print("test")
     reduce_by_path('reduced_file_v3.csv', 'reduced_file_v4.csv')
 
