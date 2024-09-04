@@ -3,6 +3,7 @@ import csv
 import collections
 import ural
 import tqdm
+from shorteners import SHORTENER_DOMAINS
 
 
 def make_csv():
@@ -34,6 +35,7 @@ def make_csv():
 
 
 def reduce_nb_domain_v1():
+    "réduit le nombre de domaines par rapport à la taille totale des URL"
     with open('reduced_file_v1.csv', 'w') as output_file:
         csv_writer = csv.writer(output_file)
         csv_writer.writerow(['Domain', 'Count', 'URL'])
@@ -48,6 +50,7 @@ def reduce_nb_domain_v1():
 
 
 def reduce_nb_domain_v2():
+    "réduit le nombre de domaines par rapport à la taille de chaque URL"
     with open('reduced_file_v2.csv', 'w') as output_file:
         csv_writer = csv.writer(output_file)
         csv_writer.writerow(['Domain', 'Count', 'URL'])
@@ -66,10 +69,23 @@ def reduce_nb_domain_v2():
                     csv_writer.writerow([row['Domain'],row['Count'],row['URL']])
 
 
+def remove_shorteners():
+    "supprime les noms de domaine déjà connus comme des shorteners"
+    with open('reduced_file_v3.csv', 'w') as output_file:
+        csv_writer = csv.writer(output_file)
+        csv_writer.writerow(['Domain', 'Count', 'URL'])
+    with open('reduced_file_v2.csv') as input_file:
+        csv_reader = csv.DictReader(input_file)
+        for row in csv_reader:
+            if row['Domain'] not in SHORTENER_DOMAINS:
+                with open('reduced_file_v3.csv', 'a') as output_file:
+                    csv_writer = csv.writer(output_file)
+                    csv_writer.writerow([row['Domain'],row['Count'],row['URL']])
+
 
 def main():
     # print("test")
-    reduce_nb_domain_v2()
+    remove_shorteners()
 
 
 if __name__ == '__main__':
