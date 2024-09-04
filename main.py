@@ -83,9 +83,30 @@ def remove_shorteners():
                     csv_writer.writerow([row['Domain'],row['Count'],row['URL']])
 
 
+def reduce_by_path(in_file, out_file):
+    "réduit le nombre de domaines en fonction de la taille du chemin de l'URL"
+    with open(out_file, 'w') as output_file:
+        csv_writer = csv.writer(output_file)
+        csv_writer.writerow(['Domain', 'Count', 'URL'])
+    with open(in_file) as input_file:
+        csv_reader = csv.DictReader(input_file)
+        for row in csv_reader:
+            tmp = row['URL']
+            list_url = tmp.split(',')
+            verif = True
+            for url in list_url:
+                path = ural.urlpathsplit(url)
+                if len(''.join(path)) > 20:
+                    verif = False
+            if verif:
+                with open(out_file, 'a') as output_file:
+                    csv_writer = csv.writer(output_file)
+                    csv_writer.writerow([row['Domain'],row['Count'],row['URL']])
+
+
 def main():
     # print("test")
-    remove_shorteners()
+    reduce_by_path('reduced_file_v3.csv', 'reduced_file_v4.csv')
 
 
 if __name__ == '__main__':
