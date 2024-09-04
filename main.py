@@ -34,6 +34,9 @@ def make_csv():
 
 
 def reduce_nb_domain_v1():
+    with open('reduced_file_v1.csv', 'w') as output_file:
+        csv_writer = csv.writer(output_file)
+        csv_writer.writerow(['Domain', 'Count', 'URL'])
     with open('domain_fakenews_tweets.csv') as input_file:
         csv_reader = csv.DictReader(input_file)
         for row in csv_reader:
@@ -45,6 +48,9 @@ def reduce_nb_domain_v1():
 
 
 def reduce_nb_domain_v2():
+    with open('reduced_file_v2.csv', 'w') as output_file:
+        csv_writer = csv.writer(output_file)
+        csv_writer.writerow(['Domain', 'Count', 'URL'])
     with open('domain_fakenews_tweets.csv') as input_file:
         csv_reader = csv.DictReader(input_file)
         for row in csv_reader:
