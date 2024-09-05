@@ -79,7 +79,7 @@ def remove_shorteners(in_file, out_file):
     with open(in_file) as input_file:
         csv_reader = csv.DictReader(input_file)
         for row in csv_reader:
-            if row['Domain'] not in SHORTENER_DOMAINS:
+            if not ural.is_shortened_url(row['Domain']):
                 with open(out_file, 'a') as output_file:
                     csv_writer = csv.writer(output_file)
                     csv_writer.writerow([row['Domain'],row['Count'],row['URL']])
