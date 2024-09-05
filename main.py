@@ -112,11 +112,76 @@ def reduce_by_nb_url(in_file, out_file):
             if len(list_url) > 1:
                 csv_writer.writerow(row)
 
+
+def shorteners_list(in_file, out_file):
+    "conserve les domaines suceptibles d'être des shorteners"
+    domain_dict = collections.defaultdict(set)
+    with open(in_file) as input_file, open(out_file, 'w+') as output_file:
+        csv_in_reader = csv.DictReader(input_file)
+        fieldnames = ['Domain', 'URLs']
+        csv_out_writer = csv.DictWriter(output_file, fieldnames=fieldnames)
+        csv_out_writer.writeheader()
+        for row in csv_in_reader:
+            nb_redirects = row['redirect_count']
+            initial_domain = row['Domain']
+            resolved_domain = ural.get_domain_name(row['resolved_url'])
+            domain_dict[initial_domain].add((resolved_domain, nb_redirects, row['URLs']))
+        for domain in domain_dict:
+            domains_count = 0
+            domains_list = []
+            list_urls = ""
+            bool_redirect = False
+            for resolved_dom, redirects, urls in domain_dict[domain]:
+                list_urls += f"{urls} "
+                if resolved_dom not in domains_list:
+                    domains_list.append(resolved_dom)
+                    domains_count += 1
+                if redirects:
+                    if int(redirects) >= 1:
+                        bool_redirect = True
+            list_urls = list_urls[:-1]
+            if bool_redirect and domains_count > 2:
+                csv_out_writer.writerow({'Domain':domain, 'URLs':list_urls})
+
+
+def shorteners_list_2(in_file, out_file):
+    "conserve les domaines suceptibles d'être des shorteners"
+    domain_dict = collections.defaultdict(set)
+    with open(in_file) as input_file, open(out_file, 'w+') as output_file:
+        csv_in_reader = csv.DictReader(input_file)
+        fieldnames = ['Domain', 'URLs']
+        csv_out_writer = csv.DictWriter(output_file, fieldnames=fieldnames)
+        csv_out_writer.writeheader()
+        for row in csv_in_reader:
+            nb_redirects = row['redirect_count']
+            initial_domain = row['Domain']
+            resolved_domain = ural.get_domain_name(row['resolved_url'])
+            domain_dict[initial_domain].add((resolved_domain, nb_redirects, row['URLs']))
+        for domain in domain_dict:
+            domains_count = 0
+            domains_list = []
+            list_urls = ""
+            bool_redirect = False
+            for resolved_dom, redirects, urls in domain_dict[domain]:
+                list_urls += f"{urls} "
+                if resolved_dom:
+                    stripped_f_host = ural.get_fingerprinted_hostname(resolved_dom, strip_suffix=True)
+                    if stripped_f_host not in domains_list and stripped_f_host != ural.get_fingerprinted_hostname(domain, strip_suffix=True):
+                        domains_list.append(stripped_f_host)
+                        domains_count += 1
+                if redirects:
+                    if int(redirects) >= 1:
+                        bool_redirect = True
+            list_urls = list_urls[:-1]
+            if bool_redirect and domains_count > 1:
+                csv_out_writer.writerow({'Domain':domain, 'URLs':list_urls})
+
+
 def main():
     "boucle principale"
     # print("test")
     # count_domains('fakenews_tweets.csv.gz', 'csv_domains_count_url.csv')
-    reduce_by_nb_url('csv_reduced_3.csv', 'csv_reduced_4.csv')
+    shorteners_list_2('result_minet.csv', 'test_shorteners_immo.csv')
 
 
 if __name__ == '__main__':
