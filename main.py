@@ -43,7 +43,7 @@ def reduce_by_total_url_size(in_file, out_file):
         csv_writer = csv.DictWriter(output_file, fieldnames=csv_reader.fieldnames)
         csv_writer.writeheader()
         for row in csv_reader:
-            size = len(row['URL'])
+            size = len(row['URLs'])
             if size < 150:
                 csv_writer.writerow(row)
 
@@ -100,11 +100,23 @@ def reduce_by_path(in_file, out_file):
                 csv_writer.writerow(row)
 
 
+def reduce_by_nb_url(in_file, out_file):
+    "supprime les noms de domaine qui n'ont qu'une seule URL"
+    with open(in_file) as input_file, open(out_file, 'w') as output_file:
+        csv_reader = csv.DictReader(input_file)
+        csv_writer = csv.DictWriter(output_file, fieldnames=csv_reader.fieldnames)
+        csv_writer.writeheader()
+        for row in csv_reader:
+            tmp = row['URLs']
+            list_url = tmp.split(' ')
+            if len(list_url) > 1:
+                csv_writer.writerow(row)
+
 def main():
     "boucle principale"
     # print("test")
-    count_domains('fakenews_tweets.csv.gz', 'csv_domains_count_url.csv')
-    # reduce_by_path('csv_reduced_2.csv', 'csv_reduced_4.csv')
+    # count_domains('fakenews_tweets.csv.gz', 'csv_domains_count_url.csv')
+    reduce_by_nb_url('csv_reduced_3.csv', 'csv_reduced_4.csv')
 
 
 if __name__ == '__main__':
